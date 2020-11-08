@@ -25,19 +25,19 @@
 #define SA struct sockaddr 
 
 //define struct for user info linked list
-//struct UserInfo {
-//  char* userId;
-//  char* password;
-//  bool loggedIn;
-//  struct UserInfo* next;
-//};
+struct UserInfo {
+  char* userId;
+  char* password;
+  char* loggedIn;
+  //struct UserInfo* next;
+};
 
 
 // Function designed for chat between client and server. 
 void func(int sockfd) 
 { 
-  char temp[80] = "received";
 	char buff[MAX]; 
+  char * temp;
 	int n; 
 	// infinite loop for chat 
 	for (;;) { 
@@ -46,23 +46,31 @@ void func(int sockfd)
 		// read the message from client and copy it in buffer 
 		read(sockfd, buff, sizeof(buff)); 
 		// print buffer which contains the client contents 
-		printf("From client: %s\t To client : ", buff); 
-		bzero(buff, MAX); 
-		n = 0; 
+		printf("From client: %s\t To client : ", buff);  
    
    if( strncmp("login", buff, 5) == 0 ){
-     buff = temp;
+     printf("received login");
+     fflush(stdout);
+     temp = "received login";
    }
    else if( strncmp("logout", buff, 6) == 0 ){
-     buff = temp;
+     printf("received logout");
+     fflush(stdout);
+     temp = "received logout";
    }
+   else{
+     printf("other");
+   }
+   
+ 		//bzero(buff, MAX); 
+		//n = 0;
    
 		// copy server message in the buffer 
 		//while ((buff[n++] = getchar()) != '\n') 
 		//	; 
 
 		// and send that buffer to client 
-		write(sockfd, buff, sizeof(buff)); 
+		write(sockfd, temp, sizeof(buff)); 
 
 		// if msg contains "Exit" then server exit and chat ended. 
 		if (strncmp("exit", buff, 4) == 0) { 
@@ -72,35 +80,39 @@ void func(int sockfd)
 	} 
 } 
 
-/*
+
 // This function prints contents of linked list starting from head 
 void printList(struct UserInfo *node) 
 { 
   while (node != NULL) 
   { 
      printf(" %s, %s, %b ", node->userId, node->password, node->loggedIn); 
-     node = node->next; 
+     //node = node->next; 
   } 
 } 
-*/
+
 
 
 /* Given a reference (pointer to pointer) to the head 
-   of a list and an int, appends a new node at the end  
+   of a list and an int, appends a new node at the end  */
 void append(struct UserInfo** head_ref, char* userid, char* passWord) 
 { 
+  printf("%s, %s\n", userid, passWord);
+  fflush(stdout);
+  return;
+  
+  /*
     // 1. allocate node 
     struct UserInfo* new_node = (struct UserInfo*) malloc(sizeof(struct UserInfo)); 
   
-    struct UserInfo *last = *head_ref;  // used in step 5
+    
   
     // 2. put in the data  
     new_node->userId  = userid; 
     new_node->password = passWord;
     new_node->loggedIn = false;
   
-    // 3. This new node is going to be the last node, so make next of 
-          it as NULL
+    // 3. This new node is going to be the last node, so make next of it as NULL
     new_node->next = NULL; 
   
     // 4. If the Linked List is empty, then make the new node as head
@@ -110,6 +122,7 @@ void append(struct UserInfo** head_ref, char* userid, char* passWord)
        return; 
     } 
   
+    struct UserInfo *last = *head_ref;  // used in step 5
     // 5. Else traverse till the last node 
     while (last->next != NULL) 
         last = last->next; 
@@ -117,8 +130,9 @@ void append(struct UserInfo** head_ref, char* userid, char* passWord)
     // 6. Change the next of last node 
     last->next = new_node; 
     return; 
+    */
 } 
-*/
+
 
 
 // Driver function 
@@ -128,7 +142,7 @@ int main()
 	struct sockaddr_in servaddr, cli; 
  
   //struct UserInfo *head = NULL;
-  char userInfoArray[100];
+  struct UserInfo userInfoArray[100];
   int counter = 0;
   char* userId;
   char* password;
@@ -163,6 +177,21 @@ int main()
       // add user info to linked list
       //append(&head, userId, password);
       //printList(head);
+      
+    // 1. allocate node 
+    //struct UserInfo* new_node = (struct UserInfo*) malloc(sizeof(struct UserInfo)); 
+    // 2. put in the data  
+    //new_node->userId  = userId; 
+    //new_node->password = password;
+    //new_node->loggedIn = false;
+    
+    userInfoArray[counter].userId = userId;
+    userInfoArray[counter].password = password;
+    userInfoArray[counter].loggedIn = "false";
+      
+    printf("%s, %s, %s\n", userInfoArray[counter].userId, userInfoArray[counter].password, userInfoArray[counter].loggedIn);      
+    counter++;
+
 /*
       //userInfoArray[counter][0] = userId[0];
  //     strcpy(userInfoArray, userId);
@@ -184,7 +213,7 @@ int main()
         
       }
       printf("\n");
-      */
+*/      
   }
  
   fclose(filePointer);  
