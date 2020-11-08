@@ -44,6 +44,21 @@ int main()
 { 
 	int sockfd, connfd, len; 
 	struct sockaddr_in servaddr, cli; 
+ 
+  
+  FILE* filePointer;
+  int bufferLength = 255;
+  char buffer[bufferLength];
+  
+  filePointer = fopen("file.txt", "r");
+  
+  while(fgets(buffer, bufferLength, filePointer)) {
+      printf("%s\n", buffer);
+  }
+ 
+  fclose(filePointer);
+  
+  
 
 	// socket create and verification 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0); 
