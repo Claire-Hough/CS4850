@@ -6,7 +6,7 @@
 #include <sys/socket.h> 
 #include <sys/types.h> 
 #define MAX 80 
-#define PORT 8080 
+#define PORT 18741 
 #define SA struct sockaddr 
 
 // Function designed for chat between client and server. 
