@@ -3,7 +3,7 @@
 #include <stdlib.h> 
 #include <string.h> 
 #include <sys/socket.h> 
-#define MAX 80 
+#define MAX 256 
 #define PORT 18741 
 #define SA struct sockaddr 
 void func(int sockfd) 

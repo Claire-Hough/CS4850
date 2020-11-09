@@ -20,7 +20,7 @@
 #include <string.h> 
 #include <sys/socket.h> 
 #include <sys/types.h> 
-#define MAX 80 
+#define MAX 256 
 #define PORT 18741 
 #define SA struct sockaddr 
 
@@ -86,10 +86,10 @@ int login(struct UserInfo userInfoArray[], char* username, char* password){
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
-  char *message;
+  char message[MAX];
   char *temp;
   int responsetype = 0;
-  printf("%d\n", responsetype);
+  //printf("%d\n", responsetype);
   
 	int n; 
 	// infinite loop for chat 
@@ -101,17 +101,18 @@ void func(int sockfd)
 		// print buffer which contains the client contents 
 		printf("From client: %s\t To client : ", buff);  
    
+   //bzero(message, MAX);
    char* username;
    char* password;
    // send message from client to login function
    if( strncmp("login", buff, 5) == 0 ){
      
     temp = strtok(buff, " ");
-    printf("\nfunction name: %s\n", temp);
+    //printf("\nfunction name: %s\n", temp);
     username = strtok(NULL, " ");
-    printf("userID: %s\n", username);
+    //printf("userID: %s\n", username);
     password = strtok(NULL, " ");
-    printf("password: %s\n", password);
+    //printf("password: %s\n", password);
    
     //responsetype = login(userInfoArray, username, password);
     //printf("response type: %d\n", responsetype);
@@ -121,25 +122,29 @@ void func(int sockfd)
     for(i=0; i < counter; i++){
     
       if( strncmp(userInfoArray[i].loggedIn, "true", 4) == 0 ){
-        message = ("Another is currently logged in. They must be logged out before another user can log in.\n");
+        strcpy(message, "Another is currently logged in. They must be logged out before another user can log in.\n");
       }
     }    
     // check if submitted login is in array
     for(i=0; i < counter; i++){
     
       //printf("%s, %s\n", userInfoArray[i].userId, username);
-      //printf("%s, %s\n", userInfoArray[i].password, password);
-      printf("i = %d\n", i);
-      fflush(stdout);
+     // printf("%s, %s\n", userInfoArray[i].password, password);
+     // printf("i = %d\n", i);
+      //fflush(stdout);
     
       // if submitted userId and password are in the array, set to logged in and return confirmation
       if( (strncmp(userInfoArray[i].userId, username, strlen(username)) == 0) && (strncmp(userInfoArray[i].password, password, strlen(password)) == 0) ){
         userInfoArray[i].loggedIn = "true";
-        message = ("User %s is now logged in.", username);
+        strcpy(message, "User is now logged in.");
+        // "User " + username + " is now logged in."
+        
+        // snprintf
       }
       // if userId or password or both are incorrect, return error message
       else{
-        message = ("The submitted userId or password were incorrect.\n");
+        //strcpy(message, "The submitted userId or password were incorrect.\n");
+        message[0] = ('t');
       }
     }
    
@@ -160,8 +165,11 @@ void func(int sockfd)
 		//while ((buff[n++] = getchar()) != '\n') 
 		//	; 
 
+    //printf("%s\n", message);
+    //fflush(stdout);
+
 		// and send that buffer to client 
-		write(sockfd, message, sizeof(buff)); 
+		write(sockfd, message, sizeof(message)); 
 
 		// if msg contains "Exit" then server exit and chat ended. 
 		if (strncmp("exit", buff, 4) == 0) { 
