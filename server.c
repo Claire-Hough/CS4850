@@ -31,12 +31,66 @@ struct UserInfo {
   char* loggedIn;
 };
 
+// global variables for userInfoArray
+struct UserInfo userInfoArray[100];
+int counter = 0;
+
+
+// newUser function
+void newUser( int counter, struct UserInfo userInfoArray[], char* userId, char* password ){
+  userInfoArray[counter].userId = userId;
+  userInfoArray[counter].password = password;
+  userInfoArray[counter].loggedIn = "false";
+  counter++;
+}
+
+
+// login function
+int login(struct UserInfo userInfoArray[], char* username, char* password){
+  int i = 0;
+  int response = 0;
+  char* message;
+  
+  // check if anyone is already logged in
+  for(i=0; i < (sizeof(userInfoArray)/sizeof(struct UserInfo)); i++){
+  
+    if( strncmp(userInfoArray[i].loggedIn, "true", 4) == 0 ){
+      response = 2;
+      return response;
+    }
+  }
+  
+  // check if submitted login is in array
+  for(i=0; i < (sizeof(userInfoArray)/sizeof(struct UserInfo)); i++){
+  
+    printf("%s, %s\n", userInfoArray[i].userId, username);
+    printf("%s, %s\n", userInfoArray[i].password, password);
+    fflush(stdout);
+  
+    // if submitted userId and password are in the array, set to logged in and return confirmation
+    if( (strncmp(userInfoArray[i].userId, username, strlen(username)) == 0) && (strncmp(userInfoArray[i].password, password, strlen(password)) == 0) ){
+      userInfoArray[i].loggedIn = "true";
+      response = 1;
+      return response;
+    }
+    // if userId or password or both are incorrect, return error message
+    else{
+      response = 0;
+      return response;
+    }
+  }
+}
+
 
 // Function designed for chat between client and server. 
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
-  char * temp;
+  char *message;
+  char *temp;
+  int responsetype = 0;
+  printf("%d\n", responsetype);
+  
 	int n; 
 	// infinite loop for chat 
 	for (;;) { 
@@ -47,10 +101,48 @@ void func(int sockfd)
 		// print buffer which contains the client contents 
 		printf("From client: %s\t To client : ", buff);  
    
+   char* username;
+   char* password;
+   // send message from client to login function
    if( strncmp("login", buff, 5) == 0 ){
-     printf("received login");
-     fflush(stdout);
-     temp = "received login";
+     
+    temp = strtok(buff, " ");
+    printf("\nfunction name: %s\n", temp);
+    username = strtok(NULL, " ");
+    printf("userID: %s\n", username);
+    password = strtok(NULL, " ");
+    printf("password: %s\n", password);
+   
+    //responsetype = login(userInfoArray, username, password);
+    //printf("response type: %d\n", responsetype);
+    
+    // check if anyone is already logged in
+    int i = 0;
+    for(i=0; i < counter; i++){
+    
+      if( strncmp(userInfoArray[i].loggedIn, "true", 4) == 0 ){
+        message = ("Another is currently logged in. They must be logged out before another user can log in.\n");
+      }
+    }    
+    // check if submitted login is in array
+    for(i=0; i < counter; i++){
+    
+      //printf("%s, %s\n", userInfoArray[i].userId, username);
+      //printf("%s, %s\n", userInfoArray[i].password, password);
+      printf("i = %d\n", i);
+      fflush(stdout);
+    
+      // if submitted userId and password are in the array, set to logged in and return confirmation
+      if( (strncmp(userInfoArray[i].userId, username, strlen(username)) == 0) && (strncmp(userInfoArray[i].password, password, strlen(password)) == 0) ){
+        userInfoArray[i].loggedIn = "true";
+        message = ("User %s is now logged in.", username);
+      }
+      // if userId or password or both are incorrect, return error message
+      else{
+        message = ("The submitted userId or password were incorrect.\n");
+      }
+    }
+   
    }
    else if( strncmp("logout", buff, 6) == 0 ){
      printf("received logout");
@@ -69,7 +161,7 @@ void func(int sockfd)
 		//	; 
 
 		// and send that buffer to client 
-		write(sockfd, temp, sizeof(buff)); 
+		write(sockfd, message, sizeof(buff)); 
 
 		// if msg contains "Exit" then server exit and chat ended. 
 		if (strncmp("exit", buff, 4) == 0) { 
@@ -80,52 +172,20 @@ void func(int sockfd)
 } 
 
 
-// newUser function
-void newUser( int counter, struct UserInfo userInfoArray[], char* userId, char* password ){
-  userInfoArray[counter].userId = userId;
-  userInfoArray[counter].password = password;
-  userInfoArray[counter].loggedIn = "false";
-}
-
-
-// login function
-void login(struct UserInfo userInfoArray[], char* username, char* password){
-  int i = 0;
-  
-  for(i=0; i < sizeof(userInfoArray); i++){
-    
-    if( userInfoArray[i].loggedIn ){
-    
-    }
-  
-    if( strncmp(userInfoArray[i].userId, username, strlen(username) == 0 ) && ( strncmp(userInfoArray) )){
-    
-      //printf("");
-    
-    }
-  }
-}
-
-
-// 
-
-
 // Driver function 
 int main() 
 { 
+  // socket variables
 	int sockfd, connfd, len; 
 	struct sockaddr_in servaddr, cli; 
  
-  //struct UserInfo *head = NULL;
-  struct UserInfo userInfoArray[100];
-  int counter = 0;
+  // variables to process file
   char* userId;
   char* password;
   char* temp;
   const char* token = ", ";
  
- 
-  // read in user login info
+  // variables to read user info file
   FILE* filePointer;
   int bufferLength = 255;
   char buffer[bufferLength];
@@ -150,12 +210,10 @@ int main()
     printf("password: %s\n", password);
     
     newUser(counter, userInfoArray, userId, password);      
-    printf("%s, %s, %s\n", userInfoArray[counter].userId, userInfoArray[counter].password, userInfoArray[counter].loggedIn);      
-    counter++;
-     
+    printf("%s, %s, %s\n", userInfoArray[counter].userId, userInfoArray[counter].password, userInfoArray[counter].loggedIn);     
   }
   
-  printf("size of array: %d\n", sizeof(userInfoArray));
+  printf("size of array: %d\n", sizeof(userInfoArray)/sizeof(struct UserInfo));
   printf("Length of username: %d\n", strlen(userId));
  
   fclose(filePointer);  
