@@ -29,7 +29,6 @@ struct UserInfo {
   char* userId;
   char* password;
   char* loggedIn;
-  //struct UserInfo* next;
 };
 
 
@@ -81,58 +80,34 @@ void func(int sockfd)
 } 
 
 
-// This function prints contents of linked list starting from head 
-void printList(struct UserInfo *node) 
-{ 
-  while (node != NULL) 
-  { 
-     printf(" %s, %s, %b ", node->userId, node->password, node->loggedIn); 
-     //node = node->next; 
-  } 
-} 
+// newUser function
+void newUser( int counter, struct UserInfo userInfoArray[], char* userId, char* password ){
+  userInfoArray[counter].userId = userId;
+  userInfoArray[counter].password = password;
+  userInfoArray[counter].loggedIn = "false";
+}
 
 
-
-/* Given a reference (pointer to pointer) to the head 
-   of a list and an int, appends a new node at the end  */
-void append(struct UserInfo** head_ref, char* userid, char* passWord) 
-{ 
-  printf("%s, %s\n", userid, passWord);
-  fflush(stdout);
-  return;
+// login function
+void login(struct UserInfo userInfoArray[], char* username, char* password){
+  int i = 0;
   
-  /*
-    // 1. allocate node 
-    struct UserInfo* new_node = (struct UserInfo*) malloc(sizeof(struct UserInfo)); 
-  
+  for(i=0; i < sizeof(userInfoArray); i++){
     
+    if( userInfoArray[i].loggedIn ){
+    
+    }
   
-    // 2. put in the data  
-    new_node->userId  = userid; 
-    new_node->password = passWord;
-    new_node->loggedIn = false;
-  
-    // 3. This new node is going to be the last node, so make next of it as NULL
-    new_node->next = NULL; 
-  
-    // 4. If the Linked List is empty, then make the new node as head
-    if (*head_ref == NULL) 
-    { 
-       *head_ref = new_node; 
-       return; 
-    } 
-  
-    struct UserInfo *last = *head_ref;  // used in step 5
-    // 5. Else traverse till the last node 
-    while (last->next != NULL) 
-        last = last->next; 
-  
-    // 6. Change the next of last node 
-    last->next = new_node; 
-    return; 
-    */
-} 
+    if( strncmp(userInfoArray[i].userId, username, strlen(username) == 0 ) && ( strncmp(userInfoArray) )){
+    
+      //printf("");
+    
+    }
+  }
+}
 
+
+// 
 
 
 // Driver function 
@@ -160,61 +135,28 @@ int main()
   // for each line in the file, grab the username and password
   while(fgets(buffer, bufferLength, filePointer)) {
 
-      temp = strtok(buffer, token);
-      userId = temp+1;
-      printf("userID: %s\n", userId);
-      
-      while (temp != NULL) 
-      {  
-        temp = strtok(NULL, " ");
-        if (temp != NULL){
-          password = temp;
-        }
-      }
-      password = strtok(password, ")");
-      printf("password: %s\n", password);
-      
-      // add user info to linked list
-      //append(&head, userId, password);
-      //printList(head);
-      
-    // 1. allocate node 
-    //struct UserInfo* new_node = (struct UserInfo*) malloc(sizeof(struct UserInfo)); 
-    // 2. put in the data  
-    //new_node->userId  = userId; 
-    //new_node->password = password;
-    //new_node->loggedIn = false;
+    temp = strtok(buffer, token);
+    userId = temp+1;
+    printf("userID: %s\n", userId);
     
-    userInfoArray[counter].userId = userId;
-    userInfoArray[counter].password = password;
-    userInfoArray[counter].loggedIn = "false";
-      
+    while (temp != NULL) 
+    {  
+      temp = strtok(NULL, " ");
+      if (temp != NULL){
+        password = temp;
+      }
+    }
+    password = strtok(password, ")");
+    printf("password: %s\n", password);
+    
+    newUser(counter, userInfoArray, userId, password);      
     printf("%s, %s, %s\n", userInfoArray[counter].userId, userInfoArray[counter].password, userInfoArray[counter].loggedIn);      
     counter++;
-
-/*
-      //userInfoArray[counter][0] = userId[0];
- //     strcpy(userInfoArray, userId);
-      counter++;
-      printf("%d\n", counter);
-      printf("%s %s\n", userId, userInfoArray[counter]);
-      //userInfoArray[counter][0] = password[0];
-      counter++;
-      printf("%d\n", counter);
-      //printf("%s ", userInfoArray[counter][0]);
-      //userInfoArray[counter][0] = "f";
-      counter++;
-      printf("%d\n", counter);
-      //printf("%s ", userInfoArray[counter][0]);
-      
-      int i=0;
-      for(i=0; i<counter; i++){
-        printf("%s ", userInfoArray[i]);
-        
-      }
-      printf("\n");
-*/      
+     
   }
+  
+  printf("size of array: %d\n", sizeof(userInfoArray));
+  printf("Length of username: %d\n", strlen(userId));
  
   fclose(filePointer);  
   
